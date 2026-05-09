@@ -1,0 +1,66 @@
+name: Free AI X Bot
+
+on:
+  schedule:
+    - cron: "0 8,11,14,17,20 * * *"
+  workflow_dispatch:
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          set -euo pipefail
+          pip install -r requirements.txt
+          playwright install --with-deps chromium
+
+      - name: Ensure local tweet history exists
+        run: |
+          set -euo pipefail
+          mkdir -p data
+          if [ ! -f data/tweet_history.json ]; then
+            echo '{"tweets": []}' > data/tweet_history.json
+            echo "Initialized empty local tweet history file."
+          else
+            echo "Using existing local tweet history file in workspace."
+          fi
+
+      - name: Validate required secrets
+        run: |
+          set -euo pipefail
+          required=(GROQ_API_KEY GROQ_MODEL X_EMAIL X_USERNAME X_PASSWORD)
+          for key in "${required[@]}"; do
+            if [ -z "${!key:-}" ]; then
+              echo "Missing required secret/env: $key" >&2
+              exit 1
+            fi
+          done
+          echo "All required secrets are present."
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_MODEL: ${{ secrets.GROQ_MODEL }}
+          X_EMAIL: ${{ secrets.X_EMAIL }}
+          X_USERNAME: ${{ secrets.X_USERNAME }}
+          X_PASSWORD: ${{ secrets.X_PASSWORD }}
+
+      - name: Run bot once
+        run: |
+          set -euo pipefail
+          python src/main.py --once
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          GROQ_MODEL: ${{ secrets.GROQ_MODEL }}
+          X_EMAIL: ${{ secrets.X_EMAIL }}
+          X_USERNAME: ${{ secrets.X_USERNAME }}
+          X_PASSWORD: ${{ secrets.X_PASSWORD }}
+          POST_TIMES_UTC: "08:00,11:00,14:00,17:00,20:00"
