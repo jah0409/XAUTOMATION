@@ -24,14 +24,6 @@ jobs:
           pip install -r requirements.txt
           playwright install --with-deps chromium
 
-      - name: Restore tweet history artifact (if present)
-        id: restore_history
-        uses: actions/download-artifact@v4
-        with:
-          name: tweet-history
-          path: data
-        continue-on-error: true
-
       - name: Ensure tweet history exists
         run: |
           set -euo pipefail
