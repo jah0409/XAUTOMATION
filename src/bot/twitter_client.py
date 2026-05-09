@@ -12,66 +12,88 @@ class XWebClient:
         self.username = username
         self.password = password
 
-    def human_delay(self, a: float = 1.0, b: float = 2.5) -> None:
+    def delay(self, a=1.5, b=3.5):
         time.sleep(random.uniform(a, b))
 
     def post_tweet(self, text: str) -> str:
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
+            browser = p.chromium.launch(
+                headless=False,
+                args=[
+                    "--disable-blink-features=AutomationControlled",
+                    "--no-sandbox",
+                ],
+            )
 
-            page = browser.new_page()
+            context = browser.new_context(
+                user_agent=(
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/122.0.0.0 Safari/537.36"
+                ),
+                viewport={"width": 1280, "height": 900},
+            )
 
-            page.goto("https://x.com/i/flow/login", timeout=60000)
+            page = context.new_page()
 
-            self.human_delay(2, 4)
+            page.goto("https://x.com/login", timeout=120000)
 
-            # Username/email input
-            page.locator('input[name="text"]').wait_for(timeout=60000)
-            page.locator('input[name="text"]').fill(self.email)
+            self.delay(5, 8)
 
-            self.human_delay()
+            page.wait_for_selector('input', timeout=120000)
+
+            inputs = page.locator("input")
+            first_input = inputs.nth(0)
+
+            first_input.fill(self.email)
+
+            self.delay()
 
             page.keyboard.press("Enter")
 
-            self.human_delay(3, 5)
+            self.delay(4, 6)
 
-            # Sometimes X asks for username confirmation
+            # Optional username verification
             try:
-                username_input = page.locator('input[data-testid="ocfEnterTextTextInput"]')
-                if username_input.is_visible(timeout=5000):
-                    username_input.fill(self.username)
-                    self.human_delay()
+                verify_input = page.locator('input').nth(0)
+
+                if verify_input.is_visible(timeout=5000):
+                    verify_input.fill(self.username)
+                    self.delay()
                     page.keyboard.press("Enter")
-                    self.human_delay(2, 4)
+                    self.delay(3, 5)
             except:
                 pass
 
-            # Password input
-            page.locator('input[name="password"]').wait_for(timeout=60000)
-            page.locator('input[name="password"]').fill(self.password)
+            password_input = page.locator('input[type="password"]')
 
-            self.human_delay()
+            password_input.wait_for(timeout=120000)
+
+            password_input.fill(self.password)
+
+            self.delay()
 
             page.keyboard.press("Enter")
 
-            self.human_delay(5, 8)
+            self.delay(8, 12)
 
-            # Open compose box
-            page.goto("https://x.com/compose/post", timeout=60000)
+            page.goto("https://x.com/compose/post", timeout=120000)
 
-            self.human_delay(4, 6)
+            self.delay(5, 8)
 
             tweet_box = page.locator('div[role="textbox"]')
-            tweet_box.wait_for(timeout=60000)
+
+            tweet_box.wait_for(timeout=120000)
 
             tweet_box.fill(text)
 
-            self.human_delay(2, 4)
+            self.delay(2, 4)
 
             post_button = page.locator('button[data-testid="tweetButtonInline"]')
+
             post_button.click()
 
-            self.human_delay(5, 8)
+            self.delay(5, 8)
 
             browser.close()
 
