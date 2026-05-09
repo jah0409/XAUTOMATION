@@ -1,7 +1,7 @@
 # Free AI Twitter/X Automation Bot (Python)
 
 This project is a beginner-friendly, low-cost automation bot that:
-- pulls trending AI topics from **Reddit + Google News RSS**,
+- pulls trending AI topics from **Google News RSS + static AI topic fallback**,
 - generates human-like curiosity-driven tweets with **Groq API**,
 - posts to X/Twitter via **Playwright web automation**,
 - runs automatically **5 times daily**,
@@ -64,7 +64,7 @@ Default UTC schedule: `08:00,11:00,14:00,17:00,20:00`.
 
 ## 2) How It Works
 
-1. `trends.py` fetches hot AI titles from Reddit and Google News RSS.
+1. `trends.py` fetches AI titles from Google News RSS and augments with a static AI topic list.
 2. `generator.py` asks Groq to write one human-sounding tweet under 240 chars.
 3. `storage.py` checks history to avoid duplicates.
 4. `twitter_client.py` uses Playwright to log in and post with:
@@ -89,6 +89,7 @@ The included workflow runs on a cron schedule and posts once per run.
 ### Workflow behavior
 - installs Python deps,
 - installs Playwright Chromium,
+- ensures local `data/tweet_history.json` exists in the workflow workspace,
 - ensures a local tweet history file exists in the workspace,
 - runs `python src/main.py --once`.
 

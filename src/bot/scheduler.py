@@ -20,11 +20,7 @@ class BotScheduler:
         self.x_client = XWebClient(settings.x_email, settings.x_username, settings.x_password)
 
     def run_once(self) -> None:
-        topics = fetch_trending_ai_topics(
-            self.settings.reddit_client_id,
-            self.settings.reddit_client_secret,
-            self.settings.reddit_user_agent,
-        )
+        topics = fetch_trending_ai_topics()
         recent = self.store.recent_tweets(200)
 
         chosen_tweet = ""
