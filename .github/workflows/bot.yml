@@ -38,7 +38,7 @@ jobs:
       - name: Validate required secrets
         run: |
           set -euo pipefail
-          required=(GROQ_API_KEY GROQ_MODEL REDDIT_CLIENT_ID REDDIT_CLIENT_SECRET REDDIT_USER_AGENT X_EMAIL X_USERNAME X_PASSWORD)
+          required=(GROQ_API_KEY GROQ_MODEL X_EMAIL X_USERNAME X_PASSWORD)
           for key in "${required[@]}"; do
             if [ -z "${!key:-}" ]; then
               echo "Missing required secret/env: $key" >&2
