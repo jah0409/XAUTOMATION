@@ -21,7 +21,10 @@ class Settings:
     def from_env() -> "Settings":
         settings = Settings(
             groq_api_key=os.getenv("GROQ_API_KEY", ""),
-            groq_model=os.getenv("GROQ_MODEL", "llama-3.1-8b-instant"),
+            groq_model=os.getenv(
+                "GROQ_MODEL",
+                "llama-3.3-70b-versatile"
+            ),
             x_email=os.getenv("X_EMAIL", ""),
             x_username=os.getenv("X_USERNAME", ""),
             x_password=os.getenv("X_PASSWORD", ""),
