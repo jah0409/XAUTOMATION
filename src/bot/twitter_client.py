@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import random
 import time
+
 from playwright.sync_api import sync_playwright
 
 
@@ -11,51 +12,67 @@ class XWebClient:
         self.username = username
         self.password = password
 
-    @staticmethod
-    def _human_type(locator, text: str) -> None:
-        for ch in text:
-            locator.type(ch, delay=random.randint(40, 120))
-
-    @staticmethod
-    def _random_delay(low: float = 0.8, high: float = 2.2) -> None:
-        time.sleep(random.uniform(low, high))
+    def human_delay(self, a: float = 1.0, b: float = 2.5) -> None:
+        time.sleep(random.uniform(a, b))
 
     def post_tweet(self, text: str) -> str:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
-            context = browser.new_context()
-            page = context.new_page()
 
-            page.goto("https://x.com/i/flow/login", wait_until="domcontentloaded")
-            self._random_delay()
+            page = browser.new_page()
 
-            user_input = page.locator('input[autocomplete="username"]')
-            user_input.wait_for(timeout=20000)
-            self._human_type(user_input, self.email)
+            page.goto("https://x.com/i/flow/login", timeout=60000)
+
+            self.human_delay(2, 4)
+
+            # Username/email input
+            page.locator('input[name="text"]').wait_for(timeout=60000)
+            page.locator('input[name="text"]').fill(self.email)
+
+            self.human_delay()
+
             page.keyboard.press("Enter")
-            self._random_delay()
 
-            maybe_username = page.locator('input[data-testid="ocfEnterTextTextInput"]')
-            if maybe_username.count() > 0:
-                self._human_type(maybe_username.first, self.username)
-                page.keyboard.press("Enter")
-                self._random_delay()
+            self.human_delay(3, 5)
 
-            pass_input = page.locator('input[name="password"]')
-            pass_input.wait_for(timeout=20000)
-            self._human_type(pass_input, self.password)
+            # Sometimes X asks for username confirmation
+            try:
+                username_input = page.locator('input[data-testid="ocfEnterTextTextInput"]')
+                if username_input.is_visible(timeout=5000):
+                    username_input.fill(self.username)
+                    self.human_delay()
+                    page.keyboard.press("Enter")
+                    self.human_delay(2, 4)
+            except:
+                pass
+
+            # Password input
+            page.locator('input[name="password"]').wait_for(timeout=60000)
+            page.locator('input[name="password"]').fill(self.password)
+
+            self.human_delay()
+
             page.keyboard.press("Enter")
-            self._random_delay(2.0, 4.0)
 
-            page.goto("https://x.com/compose/post", wait_until="domcontentloaded")
-            composer = page.locator('div[data-testid="tweetTextarea_0"]')
-            composer.wait_for(timeout=20000)
-            composer.click()
-            self._human_type(composer, text)
-            self._random_delay()
+            self.human_delay(5, 8)
 
-            page.locator('button[data-testid="tweetButton"]').click()
-            self._random_delay(2.0, 3.0)
+            # Open compose box
+            page.goto("https://x.com/compose/post", timeout=60000)
+
+            self.human_delay(4, 6)
+
+            tweet_box = page.locator('div[role="textbox"]')
+            tweet_box.wait_for(timeout=60000)
+
+            tweet_box.fill(text)
+
+            self.human_delay(2, 4)
+
+            post_button = page.locator('button[data-testid="tweetButtonInline"]')
+            post_button.click()
+
+            self.human_delay(5, 8)
 
             browser.close()
-            return "posted_via_playwright"
+
+            return "posted"
