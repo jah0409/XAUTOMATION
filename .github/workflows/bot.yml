@@ -78,11 +78,3 @@ jobs:
           X_USERNAME: ${{ secrets.X_USERNAME }}
           X_PASSWORD: ${{ secrets.X_PASSWORD }}
           POST_TIMES_UTC: "08:00,11:00,14:00,17:00,20:00"
-
-      - name: Upload tweet history artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: tweet-history
-          path: data/tweet_history.json
-          if-no-files-found: error

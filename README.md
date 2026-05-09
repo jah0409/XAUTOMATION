@@ -89,7 +89,7 @@ The included workflow runs on a cron schedule and posts once per run.
 ### Workflow behavior
 - installs Python deps,
 - installs Playwright Chromium,
-- restores/saves tweet history artifact,
+- ensures a local tweet history file exists in the workspace,
 - runs `python src/main.py --once`.
 
 ## 4) Keep It Running 24/7
