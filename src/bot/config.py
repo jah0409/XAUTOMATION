@@ -11,6 +11,9 @@ load_dotenv()
 class Settings:
     groq_api_key: str
     groq_model: str
+    reddit_client_id: str
+    reddit_client_secret: str
+    reddit_user_agent: str
     x_email: str
     x_username: str
     x_password: str
@@ -22,6 +25,9 @@ class Settings:
         settings = Settings(
             groq_api_key=os.getenv("GROQ_API_KEY", ""),
             groq_model=os.getenv("GROQ_MODEL", "llama-3.1-8b-instant"),
+            reddit_client_id=os.getenv("REDDIT_CLIENT_ID", ""),
+            reddit_client_secret=os.getenv("REDDIT_CLIENT_SECRET", ""),
+            reddit_user_agent=os.getenv("REDDIT_USER_AGENT", "ai-x-bot/1.0"),
             x_email=os.getenv("X_EMAIL", ""),
             x_username=os.getenv("X_USERNAME", ""),
             x_password=os.getenv("X_PASSWORD", ""),
@@ -33,6 +39,8 @@ class Settings:
     def validate(self) -> None:
         required = {
             "GROQ_API_KEY": self.groq_api_key,
+            "REDDIT_CLIENT_ID": self.reddit_client_id,
+            "REDDIT_CLIENT_SECRET": self.reddit_client_secret,
             "X_EMAIL": self.x_email,
             "X_USERNAME": self.x_username,
             "X_PASSWORD": self.x_password,

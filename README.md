@@ -79,6 +79,9 @@ The included workflow runs on a cron schedule and posts once per run.
 ### Add these GitHub Secrets
 - `GROQ_API_KEY`
 - `GROQ_MODEL`
+- `REDDIT_CLIENT_ID`
+- `REDDIT_CLIENT_SECRET`
+- `REDDIT_USER_AGENT`
 - `X_EMAIL`
 - `X_USERNAME`
 - `X_PASSWORD`
@@ -87,6 +90,7 @@ The included workflow runs on a cron schedule and posts once per run.
 - installs Python deps,
 - installs Playwright Chromium,
 - ensures local `data/tweet_history.json` exists in the workflow workspace,
+- ensures a local tweet history file exists in the workspace,
 - runs `python src/main.py --once`.
 
 ## 4) Keep It Running 24/7
