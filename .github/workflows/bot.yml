@@ -24,15 +24,23 @@ jobs:
           pip install -r requirements.txt
           playwright install --with-deps chromium
 
-      - name: Ensure local tweet history exists
+      - name: Restore tweet history artifact (if present)
+        id: restore_history
+        uses: actions/download-artifact@v4
+        with:
+          name: tweet-history
+          path: data
+        continue-on-error: true
+
+      - name: Ensure tweet history exists
         run: |
           set -euo pipefail
           mkdir -p data
           if [ ! -f data/tweet_history.json ]; then
             echo '{"tweets": []}' > data/tweet_history.json
-            echo "Initialized empty local tweet history file."
+            echo "Initialized empty tweet history file."
           else
-            echo "Using existing local tweet history file in workspace."
+            echo "Using restored tweet history file."
           fi
 
       - name: Validate required secrets
